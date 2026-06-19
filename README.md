@@ -17,9 +17,11 @@ A premium, modern single-page web application (SPA) built using **Python Flask**
 ## ✨ Main Features
 
 1. **Granular Release Splitting**: Google's feed groups multiple release updates under a single day's entry. The application parses the HTML markup and slices it into distinct, individual release cards (e.g. separating a day's *Feature* from an *Issue* or *Announcement*).
-2. **Glassmorphic Dark Mode**: A premium, cloud-inspired dark UI using background gradients, glowing borders, custom layout structures, and smooth interactive transitions.
+2. **Dynamic Light & Dark Modes**: A premium, cloud-inspired dark UI that can be toggled instantly to light mode via a sliding switch in the header. The color scheme is swapped dynamically by overriding the CSS root variables.
 3. **Interactive Search & Filtering**: Client-side filtering by category types (Feature, Announcement, Breaking, Deprecation, Issue, Change) and text keywords, with real-time matching counts displayed on each tab.
 4. **Twitter/X Draft Composer**: A modal allowing you to customize, copy, or tweet release updates. Includes default hashtag settings, active character calculations (counting URLs as 23 characters), and an **Auto-Summarize** text shortener to help fit within Twitter's 280-character limit.
+5. **Copy to Clipboard Utility**: Fast copy action on each card that copies a formatted release note summary with reference URLs.
+6. **Export to CSV**: Download a spreadsheet copy (`.csv`) of whatever search query or category filter you currently have active.
 
 ---
 
