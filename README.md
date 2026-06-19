@@ -26,13 +26,62 @@ A premium, modern single-page web application (SPA) built using **Python Flask**
 ## 🏗️ Architecture Breakdown
 
 ### 1. Server-Side (Flask Backend)
-The backend acts as a parser and data proxy. It exposes two routes:
-- **Root `/`**: Renders the frontend layout template.
-- **API `/api/releases`**:
-  - Fetches the Atom feed from `https://docs.cloud.google.com/feeds/bigquery-release-notes.xml`.
-  - Parses the XML using `feedparser`.
-  - Uses `BeautifulSoup` to scan each entry for `<h3>` tags. It gathers all sibling tags following a header until the next `<h3>` element, splitting bundled daily updates into separate items.
-  - Sanitizes hyperlinks (forces `target="_blank"` and `rel="noopener noreferrer"`) and outputs clean HTML and plain-text strings in a JSON payload.
+The backend is defined in [app.py](file:///C:/Users/ksukh/agy-cli-projects/bq-releases-notes/app.py). It acts as a data proxy and parser. Here is the explanation of its core mechanics:
+
+- **Flask Initialization**:
+  ```python
+  app = Flask(__name__)
+  ```
+  Initializes the Flask application, setting up routing capabilities.
+
+- **Frontend Serving Route (`/`)**:
+  ```python
+  @app.route("/")
+  def index():
+      return render_template("index.html")
+  ```
+  Listens for standard web browsers requesting the home page and responds by rendering the [templates/index.html](file:///C:/Users/ksukh/agy-cli-projects/bq-releases-notes/templates/index.html) file.
+
+- **Releases API Route (`/api/releases`)**:
+  Exposes the JSON endpoint consumed by our client.
+  - **Feed Retrieval**:
+    ```python
+    response = requests.get(FEED_URL, timeout=15)
+    ```
+    Uses the `requests` library to fetch the XML feed with a 15-second timeout.
+  - **Feed Parsing**:
+    ```python
+    feed = feedparser.parse(response.content)
+    ```
+    Uses the `feedparser` library to parse the Atom/RSS feed structure into python objects.
+  - **Granular Update Decomposition**:
+    Instead of passing daily release note blocks directly to the client, the code parses the HTML structure:
+    ```python
+    soup = BeautifulSoup(entry.summary, "html.parser")
+    headers = soup.find_all("h3")
+    ```
+    Uses `BeautifulSoup` to scan the entry content.
+    - If there are **no `<h3>` tags**, it packages the entry as a single "General" update.
+    - If **`<h3>` tags exist**, it loops through them:
+      ```python
+      while next_sibling and next_sibling.name != "h3":
+          content_elements.append(next_sibling)
+          next_sibling = next_sibling.next_sibling
+      ```
+      This collects all HTML siblings (paragraphs, lists, code samples) between successive headers (`<h3>` tags represent the release categories like *Feature*, *Issue*, *Announcement*, etc.) and packages them into distinct update items.
+  - **Hyperlink & Markup Sanitization**:
+    For each split update, the backend cleans up URLs:
+    ```python
+    for a in cleaned_soup.find_all("a"):
+        a["target"] = "_blank"
+        a["rel"] = "noopener noreferrer"
+    ```
+    This adds safety and accessibility attributes so links clicked on the client open safely in new tabs. It also strips double-newlines and extra whitespaces using `" ".join(text_content.split())` to generate a clean text draft for Twitter.
+  - **JSON Output**:
+    Returns the unified updates list in a formatted JSON structure:
+    ```python
+    return jsonify({ "status": "success", "count": len(all_updates), ... })
+    ```
 
 ### 2. Client-Side (Vanilla JS Engine)
 The frontend manages state locally to provide instant response times:
