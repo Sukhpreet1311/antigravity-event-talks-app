@@ -1553,3 +1553,100 @@ body.light-mode #toast-message {
     color: #0f172a;
 }
 
+/* Mobile Sidebar Drawer Styling */
+.mobile-only {
+    display: none !important;
+}
+
+.sidebar-mobile-header {
+    display: none;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 4, 10, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 85;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+}
+
+@media (max-width: 1024px) {
+    .mobile-only {
+        display: inline-flex !important;
+    }
+    
+    .sidebar-section {
+        position: fixed;
+        top: 0;
+        right: -360px;
+        width: 340px;
+        height: 100vh;
+        background: #060918;
+        border-left: 1px solid var(--border-color);
+        z-index: 90;
+        padding: 1.5rem;
+        overflow-y: auto;
+        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.5);
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-direction: column;
+        gap: 1.25rem;
+        display: flex !important;
+    }
+    
+    body.light-mode .sidebar-section {
+        background: #ffffff;
+        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar-section.active {
+        right: 0;
+    }
+    
+    .sidebar-mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .sidebar-mobile-header h3 {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .btn-close-sidebar {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-fast);
+    }
+    
+    .btn-close-sidebar:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    body.light-mode .btn-close-sidebar:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+}
+
+

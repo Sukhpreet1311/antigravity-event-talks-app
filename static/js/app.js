@@ -33,6 +33,10 @@ const elements = {
     btnThemeToggle: document.getElementById('btn-theme-toggle'),
     themeIcon: document.getElementById('theme-icon'),
     btnExportCsv: document.getElementById('btn-export-csv'),
+    btnSidebarToggle: document.getElementById('btn-sidebar-toggle'),
+    btnCloseSidebar: document.getElementById('btn-close-sidebar'),
+    sidebarSection: document.getElementById('sidebar-section'),
+    sidebarOverlay: document.getElementById('sidebar-overlay'),
     
     // Stats
     statTotal: document.getElementById('stat-total'),
@@ -115,6 +119,17 @@ function registerEventListeners() {
     
     // Export CSV
     elements.btnExportCsv.addEventListener('click', exportToCSV);
+    
+    // Mobile Sidebar toggle
+    if (elements.btnSidebarToggle) {
+        elements.btnSidebarToggle.addEventListener('click', showSidebar);
+    }
+    if (elements.btnCloseSidebar) {
+        elements.btnCloseSidebar.addEventListener('click', hideSidebar);
+    }
+    if (elements.sidebarOverlay) {
+        elements.sidebarOverlay.addEventListener('click', hideSidebar);
+    }
     
     // Settings change
     elements.defaultHashtagsInput.addEventListener('input', syncSettingsFromUI);
@@ -770,4 +785,29 @@ function escapeCSV(text) {
     if (!text) return '""';
     let escaped = text.replace(/"/g, '""'); // escape double quotes
     return `"${escaped}"`;
+}
+
+// Mobile Sidebar Drawer Actions
+function showSidebar() {
+    if (elements.sidebarSection) {
+        elements.sidebarSection.classList.add('active');
+    }
+    if (elements.sidebarOverlay) {
+        elements.sidebarOverlay.style.display = 'block';
+        setTimeout(() => {
+            elements.sidebarOverlay.classList.add('active');
+        }, 10);
+    }
+}
+
+function hideSidebar() {
+    if (elements.sidebarSection) {
+        elements.sidebarSection.classList.remove('active');
+    }
+    if (elements.sidebarOverlay) {
+        elements.sidebarOverlay.classList.remove('active');
+        setTimeout(() => {
+            elements.sidebarOverlay.style.display = 'none';
+        }, 300);
+    }
 }

@@ -55,6 +55,9 @@
                         <i data-lucide="refresh-cw" class="icon-refresh"></i>
                         <span>Refresh Notes</span>
                     </button>
+                    <button id="btn-sidebar-toggle" class="btn btn-secondary btn-theme mobile-only" title="View Settings & Resources">
+                        <i data-lucide="menu"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -167,7 +170,14 @@
             </div>
 
             <!-- Sidebar Column (Right) -->
-            <aside class="sidebar-section">
+            <aside class="sidebar-section" id="sidebar-section">
+                <!-- Mobile Sidebar Header -->
+                <div class="sidebar-mobile-header">
+                    <h3>Settings & Resources</h3>
+                    <button id="btn-close-sidebar" class="btn-close-sidebar" title="Close Menu">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
                 <!-- Share Helper Options -->
                 <div class="sidebar-card">
                     <h3><i data-lucide="settings"></i> Tweet Settings</h3>
@@ -236,6 +246,9 @@
             </aside>
         </main>
     </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay" style="display: none;"></div>
 
     <!-- Modal: Tweet Composer -->
     <div id="tweet-modal" class="modal-overlay" style="display: none;">
