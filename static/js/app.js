@@ -30,6 +30,9 @@ const state = {
 const elements = {
     btnRefresh: document.getElementById('btn-refresh'),
     lastSyncTime: document.getElementById('last-sync-time'),
+    btnThemeToggle: document.getElementById('btn-theme-toggle'),
+    themeIcon: document.getElementById('theme-icon'),
+    btnExportCsv: document.getElementById('btn-export-csv'),
     
     // Stats
     statTotal: document.getElementById('stat-total'),
@@ -85,6 +88,9 @@ const elements = {
 
 // Initial setup
 document.addEventListener('DOMContentLoaded', () => {
+    // Load theme from localStorage
+    initTheme();
+    
     // Initialise Lucide icons
     lucide.createIcons();
     
@@ -103,6 +109,12 @@ function registerEventListeners() {
     // Refresh buttons
     elements.btnRefresh.addEventListener('click', () => fetchReleaseNotes());
     elements.btnRetry.addEventListener('click', () => fetchReleaseNotes());
+    
+    // Theme toggle
+    elements.btnThemeToggle.addEventListener('click', toggleTheme);
+    
+    // Export CSV
+    elements.btnExportCsv.addEventListener('click', exportToCSV);
     
     // Settings change
     elements.defaultHashtagsInput.addEventListener('input', syncSettingsFromUI);
@@ -686,4 +698,76 @@ function showToast(iconName, message) {
     toastTimeout = setTimeout(() => {
         elements.toast.classList.remove('show');
     }, 3500);
+}
+
+// Theme management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        elements.themeIcon.setAttribute('data-lucide', 'sun');
+    } else {
+        document.body.classList.remove('light-mode');
+        elements.themeIcon.setAttribute('data-lucide', 'moon');
+    }
+    lucide.createIcons();
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    
+    if (isLight) {
+        elements.themeIcon.setAttribute('data-lucide', 'sun');
+        showToast('sun', 'Switched to Light Mode');
+    } else {
+        elements.themeIcon.setAttribute('data-lucide', 'moon');
+        showToast('moon', 'Switched to Dark Mode');
+    }
+    lucide.createIcons();
+}
+
+// Export to CSV
+function exportToCSV() {
+    if (state.filteredUpdates.length === 0) {
+        showToast('alert-triangle', 'No updates available to export.');
+        return;
+    }
+    
+    // CSV Header
+    let csvString = 'Date,Type,Description,URL\r\n';
+    
+    // Loop over current filtered updates
+    state.filteredUpdates.forEach(update => {
+        const date = escapeCSV(update.date);
+        const type = escapeCSV(update.type);
+        const desc = escapeCSV(update.content_text);
+        const url = escapeCSV(update.link);
+        
+        csvString += `${date},${type},${desc},${url}\r\n`;
+    });
+    
+    // Download Blob
+    try {
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `bigquery_release_notes_${state.filterType}_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('download', 'Release notes exported to CSV!');
+    } catch (err) {
+        console.error('CSV export failed:', err);
+        showToast('x', 'Failed to export CSV.');
+    }
+}
+
+// Helper to escape CSV cell contents
+function escapeCSV(text) {
+    if (!text) return '""';
+    let escaped = text.replace(/"/g, '""'); // escape double quotes
+    return `"${escaped}"`;
 }
